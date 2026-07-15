@@ -10,8 +10,7 @@ def generate_ai_response(chat_history_list, new_message_text, task_context=""):
     """
     # 1. Structure the foundational system prompt
     system_prompt = (
-        "You are an intelligent project management assistant. Help the user break down, "
-        f"understand, and plan their tasks. Current task focus context: {task_context}"
+        f"You are an intelligent project management assistant. Help the user break down, understand, and plan their tasks. Current task focus context: {task_context}"
     )
     
     messages = [{"role": "system", "content": system_prompt}]
