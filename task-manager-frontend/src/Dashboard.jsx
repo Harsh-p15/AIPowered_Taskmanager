@@ -1,6 +1,7 @@
 import React,{ useState, useEffect} from 'react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
+import ChatDrawer from './ChatDrawer';
 
 
 function Dashboard() {
@@ -14,6 +15,9 @@ function Dashboard() {
     const[editTitle, setEditTitle] = useState('');
     const[editDescription, setEditDescription] = useState('');
     const[error, setError] = useState('');
+
+    const[isChatOpen, setIsChatOpen] = useState(false);
+    const[SelectedTask, setSelectedTask] = useState(null);
 
      const htitle = (e) =>{setTitle(e.target.value)};
      const hdescription = (e) =>{setDescription(e.target.value)};
@@ -153,6 +157,16 @@ function Dashboard() {
                 <button onClick={() => deleteTasks(task.task_id)} style={{ background: 'red', color: 'white', border: 'none', cursor: 'pointer', padding: '3px 8px' }}>
                   Delete
                 </button>
+
+                {/*chat with AI button */}
+
+                <button onClick = {() => {
+                  setSelectedTask(task);
+                  setIsChatOpen(true);
+                }}
+                style={{ backgroundColor: '#8E24AA', color: '#fff', marginLeft: '8px', padding: '6px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+
+                Chat with AI </button>
               </div>
 
             </li>
@@ -160,6 +174,14 @@ function Dashboard() {
         </ul>
       )}
     </div>
+    {/* rendering chatDrawer with every task*/}
+    <ChatDrawer
+      isOpen={isChatOpen}
+      onClose={() => setIsChatOpen(false)}
+      taskId = {SelectedTask?.task_id}
+      taskTitle={SelectedTask?.title}
+      token = {localStorage.getItem('access_token')}
+      />
     </>
     );
 }

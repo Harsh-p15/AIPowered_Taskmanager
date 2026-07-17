@@ -42,7 +42,7 @@ function ChatDrawer({ isOpen, onClose, taskId, taskTitle, token }) {
     
     // Optimistically update the UI with the user's message immediately
     setMessages((prev) => [...prev, { role: 'USER', content: userMsg }]);
-    setIsLoading(True);
+    setIsLoading(true);
 
     try {
       const response = await axios.post(
@@ -97,7 +97,7 @@ function ChatDrawer({ isOpen, onClose, taskId, taskTitle, token }) {
                   color: '#ffffff'
                 }}
               >
-                <strong>{msg.role === 'USER' ? 'You' : 'Qwen'}</strong>
+                <strong>{msg.role === 'USER' ? 'You' : 'Jarvis'}</strong>
                 <p style={{ margin: '5px 0 0 0', whiteSpace: 'pre-line' }}>{msg.content}</p>
               </div>
             </div>
@@ -105,7 +105,7 @@ function ChatDrawer({ isOpen, onClose, taskId, taskTitle, token }) {
           {isLoading && (
             <div style={{ ...styles.messageWrapper, justifyContent: 'flex-start' }}>
               <div style={{ ...styles.bubble, backgroundColor: '#333333', color: '#aaa' }}>
-                <em>Qwen is thinking...</em>
+                <em>Jarvis is thinking...</em>
               </div>
             </div>
           )}

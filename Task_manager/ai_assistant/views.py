@@ -17,7 +17,7 @@ class TaskChatView(APIView):
         except Tasks.DoesNotExist:
             return Response({"error": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
             
-        session, created = TaskChatSession.objects.get_or_create(task=task, user=request.user)
+        session, created = TaskChatSession.objects.get_or_create(tasks=task, user=request.user)
         serializer = TaskChatSessionSerializer(session)
         return Response(serializer.data)
 
@@ -33,10 +33,11 @@ class TaskChatView(APIView):
             return Response({"error": "Message content cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
 
         # 1. Fetch or initialize the chat session block
-        session, created = TaskChatSession.objects.get_or_create(task=task, user=request.user)
+        session, created = TaskChatSession.objects.get_or_create(tasks=task, user=request.user)
 
         # 2. Extract and format historical context for llama.cpp format compatibility
-        past_messages = ChatMessage.objects.filter(session=session)
+        past_messages = ChatMessage.objects.filter(session=session).order_by('-timestamp')[:8]
+        past_messages = reversed(past_messages)
         history_list = []
         for msg in past_messages:
             role_name = "user" if msg.role == "USER" else "assistant"
