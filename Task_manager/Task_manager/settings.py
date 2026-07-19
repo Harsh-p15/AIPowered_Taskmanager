@@ -22,7 +22,6 @@ env = environ.Env()
 # Read the .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-# ... keep everything else the same, and add this at the bottom of the file:
 GROQ_API_KEY = env('GROQ_API_KEY', default='')
 
 # Quick-start development settings - unsuitable for production

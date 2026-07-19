@@ -2,6 +2,7 @@ import React,{ useState, useEffect} from 'react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import ChatDrawer from './ChatDrawer';
+import { TASK_STATUS, STATUS_LABELS} from './utils/constants.js';
 
 
 function Dashboard() {
@@ -14,10 +15,16 @@ function Dashboard() {
     const[editingTaskId, setEditingTaskId] = useState(null);
     const[editTitle, setEditTitle] = useState('');
     const[editDescription, setEditDescription] = useState('');
+    const [showCreateForm, setShowCreateForm] = useState(false);
+    const[dueDate, setDueDate] = useState('');
+    const[editDate, setEditDate] = useState('');
     const[error, setError] = useState('');
 
     const[isChatOpen, setIsChatOpen] = useState(false);
     const[SelectedTask, setSelectedTask] = useState(null);
+
+    const[status, setStatus]= useState(TASK_STATUS.IN_PROGRESS);
+    const[editstatus, setEditStatus] = useState(TASK_STATUS.IN_PROGRESS);
 
      const htitle = (e) =>{setTitle(e.target.value)};
      const hdescription = (e) =>{setDescription(e.target.value)};
@@ -61,9 +68,12 @@ function Dashboard() {
     const CreateTasks = async (e) => {
         e.preventDefault();
         try{
-            await axios.post('http://127.0.0.1:8000/api/tasks/', { title, description}, getAuthHeaders());
+            await axios.post('http://127.0.0.1:8000/api/tasks/', { title, description, status, dueDate:dueDate}, getAuthHeaders());
             setTitle('');
             setDescription('');
+            setStatus('TASK_STATUS.IN_PROGRESS');//default status
+            setShowCreateForm(false); // ✅ Collapses the form layout dynamically after adding
+            setDueDate('');
             fetchTasks();
 
         }
@@ -92,7 +102,9 @@ function Dashboard() {
             try{
                 await axios.put(`http://127.0.0.1:8000/api/tasks/${id}/`,{
                     title:editTitle,
-                    description:editDescription
+                    description:editDescription,
+                    status:editstatus,
+                    dueDate: dueDate
                 
                 }, getAuthHeaders());
 
@@ -108,6 +120,8 @@ function Dashboard() {
         setEditingTaskId(task.task_id);
         setEditTitle(task.title);
         setEditDescription(task.description);
+        setEditStatus(task.status || TASK_STATUS.IN_PROGRESS);
+        setDueDate(task.dueDate || '');
         };
 
     
@@ -116,12 +130,40 @@ function Dashboard() {
         <>
         <div>
         <h1> Dashboard</h1>
-      
+        {!showCreateForm ? (
+    <button 
+        onClick={() => setShowCreateForm(true)} 
+        style={{ padding: '8px 16px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginBottom: '20px' }}
+    >
+        + Add New Task
+    </button>
+  ) : (
         <form onSubmit = {CreateTasks}>
             <input type = "text" placeholder =" title" value = {title} onChange = {htitle}/>
             <input type = 'text' placeholder = 'description' value ={description} onChange = {hdescription}/>
-            <input type = "submit" value = "Add task"/>
+            <input type = 'date' value = {dueDate|| ''} onChange = {(e) => setDueDate(e.target.value)}/>
+
+            {/* Dropdown for creating a task */}
+                <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value={TASK_STATUS.IN_PROGRESS}>In Progress</option>
+                    <option value={TASK_STATUS.COMPLETED}>Completed</option>
+                    <option value={TASK_STATUS.HALTED}>Halted</option>
+                </select>
+
+            <input type = "submit" value = "Add task" style={{ padding: '4px 12px', background: 'green', color: 'white', border: 'none', cursor: 'pointer' }}/>
+            <button 
+            type="button" 
+            onClick={() => {
+                setShowCreateForm(false);
+                setTitle('');
+                setDescription('');
+            }} 
+            style={{ padding: '4px 12px', background: 'gray', color: 'white', border: 'none', cursor: 'pointer' }}
+        >
+            Cancel
+        </button>
         </form>
+  )}
 
         {/* READ & UPDATE/DELETE LIST */}
       <h3>Task List</h3>
@@ -137,13 +179,48 @@ function Dashboard() {
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
                   <input type="text" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+                  <input type = 'date' value = {dueDate || ''} onChange = {(e)=> (e.target.value)}/>
+                  {/* Dropdown for modifying an existing task status */}
+                                    <select value={editstatus} onChange={(e) => setEditStatus(e.target.value)}>
+                                        <option value={TASK_STATUS.IN_PROGRESS}>In Progress</option>
+                                        <option value={TASK_STATUS.COMPLETED}>Completed</option>
+                                        <option value={TASK_STATUS.HALTED}>Halted</option>
+                                    </select>
+                                    
                   <button onClick={() => handleUpdate(task.task_id)} style={{ background: 'orange', color: 'white', border: 'none', cursor: 'pointer' }}>Save</button>
                   <button onClick={() => setEditingTaskId(null)} style={{ background: 'gray', color: 'white', border: 'none', cursor: 'pointer' }}>Cancel</button>
                 </div>
               ) : (
                 // IF NOT EDITING: Show plain text description
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                 <div>
                   <strong>{task.title}</strong>: {task.description}
+                </div>
+                {/* 📅 Dynamic Due Date Display */}
+    {task.due_date ? (
+        <span style={{ fontSize: '13px', color: '#ffa500', backgroundColor: '#3a2a10', padding: '2px 8px', borderRadius: '4px', border: '1px solid #6b4c1b' }}>
+            📅 Due: {task.dueDate}
+        </span>
+    ) : (
+        <span style={{ fontSize: '13px', color: '#888', fontStyle: 'italic' }}>
+            No deadline
+        </span>
+    )}
+
+                  {/* Dynamic Inline Visual Status Badge */}
+                                    <span style={{
+                                        padding: '2px 8px',
+                                        fontSize: '12px',
+                                        fontWeight: 'bold',
+                                        borderRadius: '12px',
+                                        border: '1px solid',
+                                        backgroundColor: task.status === TASK_STATUS.COMPLETED ? '#d1fae5' : task.status === TASK_STATUS.HALTED ? '#ffe4e6' : '#e0f2fe',
+                                        color: task.status === TASK_STATUS.COMPLETED ? '#065f46' : task.status === TASK_STATUS.HALTED ? '#991b1b' : '#075985',
+                                        borderColor: task.status === TASK_STATUS.COMPLETED ? '#a7f3d0' : task.status === TASK_STATUS.HALTED ? '#fecdd3' : '#bae6fd'
+                                    }}>
+                                        {STATUS_LABELS[task.status] || 'In Progress'}
+                                    </span>
+
                 </div>
               )}
 
