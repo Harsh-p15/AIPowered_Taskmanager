@@ -20,10 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Initialize environment variables
 env = environ.Env()
 # Read the .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+environ.Env.read_env(os.path.join(BASE_DIR.parent, '.env'))
 
 GROQ_API_KEY = env('GROQ_API_KEY', default='')
-
+print("BASE_DIR IS:", BASE_DIR)
+print("LOOKING FOR .ENV AT:", os.path.join(BASE_DIR, '.env'))
+print("LOADED GROQ KEY:", repr(GROQ_API_KEY))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
