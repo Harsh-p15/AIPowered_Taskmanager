@@ -15,8 +15,8 @@ function Dashboard() {
     const[editingTaskId, setEditingTaskId] = useState(null);
     const[editTitle, setEditTitle] = useState('');
     const[editDescription, setEditDescription] = useState('');
-    const [showCreateForm, setShowCreateForm] = useState(false);
-    const[dueDate, setDueDate] = useState('');
+    const[showCreateForm, setShowCreateForm] = useState(false);
+    const[due_date, setDue_Date] = useState('');
     const[editDate, setEditDate] = useState('');
     const[error, setError] = useState('');
 
@@ -68,12 +68,17 @@ function Dashboard() {
     const CreateTasks = async (e) => {
         e.preventDefault();
         try{
-            await axios.post('http://127.0.0.1:8000/api/tasks/', { title, description, status, dueDate:dueDate}, getAuthHeaders());
+            await axios.post('http://127.0.0.1:8000/api/tasks/', { 
+                title, 
+                description, 
+                status, 
+                due_date:due_date}, getAuthHeaders()
+            );
             setTitle('');
             setDescription('');
             setStatus('TASK_STATUS.IN_PROGRESS');//default status
             setShowCreateForm(false); // ✅ Collapses the form layout dynamically after adding
-            setDueDate('');
+            setDue_Date('');
             fetchTasks();
 
         }
@@ -104,7 +109,7 @@ function Dashboard() {
                     title:editTitle,
                     description:editDescription,
                     status:editstatus,
-                    dueDate: dueDate
+                    due_date:editDate
                 
                 }, getAuthHeaders());
 
@@ -121,7 +126,7 @@ function Dashboard() {
         setEditTitle(task.title);
         setEditDescription(task.description);
         setEditStatus(task.status || TASK_STATUS.IN_PROGRESS);
-        setDueDate(task.dueDate || '');
+        setDue_Date(task.due_date ? task.due_date:'');
         };
 
     
@@ -141,7 +146,7 @@ function Dashboard() {
         <form onSubmit = {CreateTasks}>
             <input type = "text" placeholder =" title" value = {title} onChange = {htitle}/>
             <input type = 'text' placeholder = 'description' value ={description} onChange = {hdescription}/>
-            <input type = 'date' value = {dueDate|| ''} onChange = {(e) => setDueDate(e.target.value)}/>
+            <input type = 'date' value = {due_date|| ''} onChange = {(e) => setDue_Date(e.target.value)}/>
 
             {/* Dropdown for creating a task */}
                 <select value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -179,7 +184,11 @@ function Dashboard() {
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
                   <input type="text" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
-                  <input type = 'date' value = {dueDate || ''} onChange = {(e)=> (e.target.value)}/>
+                  <input type = 'date' value = {editDate} onChange = {(e)=>{ 
+                    console.log("Selected Date Value:", e.target.value);
+                    setEditDate(e.target.value);
+
+                  }}/>
                   {/* Dropdown for modifying an existing task status */}
                                     <select value={editstatus} onChange={(e) => setEditStatus(e.target.value)}>
                                         <option value={TASK_STATUS.IN_PROGRESS}>In Progress</option>
@@ -199,7 +208,7 @@ function Dashboard() {
                 {/* 📅 Dynamic Due Date Display */}
     {task.due_date ? (
         <span style={{ fontSize: '13px', color: '#ffa500', backgroundColor: '#3a2a10', padding: '2px 8px', borderRadius: '4px', border: '1px solid #6b4c1b' }}>
-            📅 Due: {task.dueDate}
+            📅 Due: {task.due_date}
         </span>
     ) : (
         <span style={{ fontSize: '13px', color: '#888', fontStyle: 'italic' }}>
