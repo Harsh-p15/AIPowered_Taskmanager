@@ -43,7 +43,7 @@ function Login({ onLoginSuccess }) {
             <Layers className="w-8 h-8" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Welcome back</h1>
-          <p className="text-sm text-slate-500">Log in to manage your TaskFlow assignments</p>
+          <p className="text-sm text-slate-500">Log in to manage your Tasks!</p>
         </div>
 
         {/* Error Alert */}
