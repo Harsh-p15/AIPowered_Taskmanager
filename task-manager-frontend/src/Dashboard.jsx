@@ -98,10 +98,17 @@ function Dashboard() {
   // Add new Tasks
   const CreateTasks = async (e) => {
     e.preventDefault();
+
+    const payload = {
+    title,
+    description,
+    status,
+    due_date: due_date.trim() === '' ?  null : due_date,
+    };
     try {
       await axios.post(
         'http://127.0.0.1:8000/api/tasks/', 
-        { title, description, status, due_date }, 
+        payload , 
         getAuthHeaders()
       );
       setTitle('');
@@ -128,15 +135,17 @@ function Dashboard() {
 
   // Update Tasks
   const handleUpdate = async (id) => {
+
+    const payload = {
+    title: editTitle,
+    description: editDescription,
+    status: editstatus,
+    due_date: editDate.trim() === '' ? null : editDate,
+        };
     try {
       await axios.put(
         `http://127.0.0.1:8000/api/tasks/${id}/`,
-        {
-          title: editTitle,
-          description: editDescription,
-          status: editstatus,
-          due_date: editDate
-        }, 
+        payload, 
         getAuthHeaders()
       );
       setEditingTaskId(null);
