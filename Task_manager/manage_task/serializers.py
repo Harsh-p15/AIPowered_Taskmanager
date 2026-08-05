@@ -3,6 +3,8 @@ from manage_task.models import Tasks
 from django.contrib.auth.models import User
 
 class TaskSerializer(serializers.ModelSerializer):
+    due_date = serializers.DateField(required=False, allow_null=True)
+    
     class Meta:
         model = Tasks
         fields = "__all__"
