@@ -192,6 +192,8 @@ function Dashboard() {
   // Filter tasks based on active sidebar tab
   const displayedTasks = tasks.filter(t => {
     if (activeTab === 'completed') return t.status === TASK_STATUS.COMPLETED;
+    if (activeTab === 'in-progress') return t.status === TASK_STATUS.IN_PROGRESS;
+    if (activeTab === 'halted') return t.status === TASK_STATUS.HALTED;
     return true; // 'my-tasks' shows all
   });
 
@@ -209,31 +211,55 @@ function Dashboard() {
           </div>
 
           <nav className="p-4 space-y-1">
-            <button
-              onClick={() => setActiveTab('my-tasks')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+              <button
+               onClick={() => setActiveTab('my-tasks')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
                 activeTab === 'my-tasks' 
                   ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-              }`}
-            >
-              <CheckSquare className="w-5 h-5" />
-              My Tasks
-            </button>
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                }`}
+              >
+          <CheckSquare className="w-5 h-5" />
+            My Tasks
+          </button>
 
             <button
-              onClick={() => setActiveTab('completed')}
+              onClick={() => setActiveTab('in-progress')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
-                activeTab === 'completed' 
-                  ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+              activeTab === 'in-progress' 
+              ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
-            >
-              <CheckCircle2 className="w-5 h-5" />
-              Completed
-            </button>
-          </nav>
-        </div>
+          >
+          <Clock className="w-5 h-5" />
+            In Progress
+          </button>
+
+          <button
+            onClick={() => setActiveTab('halted')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+            activeTab === 'halted' 
+            ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
+            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+            }`}
+          >
+          <PauseCircle className="w-5 h-5" />
+            Halted
+          </button>
+
+        <button
+          onClick={() => setActiveTab('completed')}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+          activeTab === 'completed' 
+          ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
+          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+          }`}
+        >
+        <CheckCircle2 className="w-5 h-5" />
+          Completed
+      </button>
+      </nav>
+      </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
@@ -509,13 +535,27 @@ function Dashboard() {
                             className="mt-1 w-5 h-5 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 cursor-pointer"
                           />
                           <div>
-                            <h3 className={`text-base font-semibold ${
-                              task.status === TASK_STATUS.COMPLETED 
-                                ? 'line-through text-slate-400 dark:text-slate-500' 
-                                : 'text-slate-800 dark:text-slate-100'
-                            }`}>
-                              {task.title}
-                            </h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className={`text-base font-semibold ${
+                                task.status === TASK_STATUS.COMPLETED 
+                                  ? 'line-through text-slate-400 dark:text-slate-500' 
+                                  : 'text-slate-800 dark:text-slate-100'
+                              }`}>
+                                {task.title}
+                              </h3>
+
+                              {/* Status Badge */}
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                                task.status === TASK_STATUS.COMPLETED
+                                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400'
+                                  : task.status === TASK_STATUS.HALTED
+                                  ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400'
+                                  : 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400'
+                              }`}>
+                                {task.status === TASK_STATUS.IN_PROGRESS ? 'In Progress' : task.status === TASK_STATUS.HALTED ? 'Halted' : 'Completed'}
+                              </span>
+                            </div>
+
                             <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{task.description}</p>
                           </div>
                         </div>
