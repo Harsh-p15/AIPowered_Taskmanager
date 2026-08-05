@@ -17,7 +17,9 @@ import {
   Trash2, 
   Search, 
   LogOut, 
-  X 
+  X,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 function Dashboard() {
@@ -41,6 +43,25 @@ function Dashboard() {
   const [status, setStatus] = useState(TASK_STATUS.IN_PROGRESS);
   const [editstatus, setEditStatus] = useState(TASK_STATUS.IN_PROGRESS);
   const [activeTab, setActiveTab] = useState('my-tasks');
+
+  // Dark Mode State Initializer
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+
+  // Apply dark mode class to root HTML element
+  useEffect(() => {
+    const root = document.documentElement;
+    if (darkMode) {
+      root.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
+
+  const toggleDarkMode = () => setDarkMode(!darkMode);
 
   const htitle = (e) => setTitle(e.target.value);
   const hdescription = (e) => setDescription(e.target.value);
@@ -166,23 +187,25 @@ function Dashboard() {
   });
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-800 font-sans antialiased overflow-hidden">
+    <div className="flex h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased overflow-hidden transition-colors duration-200">
       
-      {/* LEFT SIDEBAR (Only My Tasks & Completed) */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0">
+      {/* LEFT SIDEBAR */}
+      <aside className="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col justify-between shrink-0 transition-colors duration-200">
         <div>
-          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100 dark:border-slate-700">
             <div className="p-2 bg-blue-600 rounded-lg text-white">
               <Layers className="w-5 h-5" />
             </div>
-            <span className="font-bold text-lg text-slate-900 tracking-tight">TaskFlow</span>
+            <span className="font-bold text-lg text-slate-900 dark:text-white tracking-tight">TaskFlow</span>
           </div>
 
           <nav className="p-4 space-y-1">
             <button
               onClick={() => setActiveTab('my-tasks')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
-                activeTab === 'my-tasks' ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-100'
+                activeTab === 'my-tasks' 
+                  ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
             >
               <CheckSquare className="w-5 h-5" />
@@ -192,7 +215,9 @@ function Dashboard() {
             <button
               onClick={() => setActiveTab('completed')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
-                activeTab === 'completed' ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-100'
+                activeTab === 'completed' 
+                  ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
             >
               <CheckCircle2 className="w-5 h-5" />
@@ -206,47 +231,58 @@ function Dashboard() {
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         
         {/* TOP NAVBAR */}
-<header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
-  <div className="relative w-96">
-    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-    <input
-      type="text"
-      placeholder="Search tasks, labels..."
-      className="w-full pl-9 pr-4 py-2 bg-slate-100/70 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 border border-transparent focus:border-blue-500"
-    />
-  </div>
+        <header className="h-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-8 flex items-center justify-between sticky top-0 z-10 transition-colors duration-200">
+          <div className="relative w-96">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search tasks, labels..."
+              className="w-full pl-9 pr-4 py-2 bg-slate-100/70 dark:bg-slate-700/60 rounded-lg text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 border border-transparent focus:border-blue-500"
+            />
+          </div>
 
-  <div className="flex items-center gap-6">
-    {/* Dynamic Welcome Greeting */}
-    <div className="flex items-center gap-3">
-      <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-xs uppercase">
-        {username.charAt(0)}
-      </div>
-      <span className="text-sm font-semibold text-slate-700">
-        Welcome, <span className="text-blue-600 font-bold capitalize">{username}</span>
-      </span>
-    </div>
+          <div className="flex items-center gap-6">
 
-    {/* Logout Button */}
-    <button 
-      onClick={() => {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('username');
-        navigate('/login');
-      }}
-      className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 transition-colors ml-2"
-    >
-      <LogOut className="w-4 h-4" />
-      Logout
-    </button>
-  </div>
-</header>
+            {/* Dark Mode Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleDarkMode}
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer"
+              title="Toggle Theme"
+            >
+              {darkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
+            </button>
+
+            {/* Dynamic Welcome Greeting */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-xs uppercase">
+                {username.charAt(0)}
+              </div>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                Welcome, <span className="text-blue-600 dark:text-blue-400 font-bold capitalize">{username}</span>
+              </span>
+            </div>
+
+            {/* Logout Button */}
+            <button 
+              onClick={() => {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('username');
+                navigate('/login');
+              }}
+              className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors ml-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
+          </div>
+        </header>
 
         {/* MAIN BODY */}
         <main className="p-8 max-w-7xl w-full mx-auto space-y-8">
           
           {error && (
-            <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-sm">
+            <div className="p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 rounded-xl text-sm">
               {error}
             </div>
           )}
@@ -254,10 +290,10 @@ function Dashboard() {
           {/* Header Title & Add Task Button */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
                 {activeTab === 'completed' ? 'Completed Tasks' : 'My Tasks'}
               </h1>
-              <p className="text-sm text-slate-500 mt-1">Manage, organize, and execute your daily assignments.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage, organize, and execute your daily assignments.</p>
             </div>
             {!showCreateForm && (
               <button
@@ -272,8 +308,8 @@ function Dashboard() {
 
           {/* CREATE TASK FORM CARD */}
           {showCreateForm && (
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm transition-all">
-              <h2 className="text-lg font-bold text-slate-900 mb-4">Create New Task</h2>
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Create New Task</h2>
               <form onSubmit={CreateTasks} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <input
@@ -282,13 +318,13 @@ function Dashboard() {
                     value={title}
                     onChange={htitle}
                     required
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="date"
                     value={due_date || ''}
                     onChange={(e) => setDue_Date(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 
@@ -297,14 +333,14 @@ function Dashboard() {
                   value={description}
                   onChange={hdescription}
                   rows="2"
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
 
                 <div className="flex items-center justify-between pt-2">
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value={TASK_STATUS.IN_PROGRESS}>In Progress</option>
                     <option value={TASK_STATUS.COMPLETED}>Completed</option>
@@ -319,7 +355,7 @@ function Dashboard() {
                         setTitle('');
                         setDescription('');
                       }}
-                      className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-medium transition-colors"
+                      className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-medium transition-colors"
                     >
                       Cancel
                     </button>
@@ -335,101 +371,101 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STATS CARDS GRID (With Tasks Halted Card Included) */}
+          {/* STATS CARDS GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* Total Tasks */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Tasks</span>
-                <p className="text-3xl font-bold text-slate-900 mt-2">{totalTasksCount}</p>
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Total Tasks</span>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{totalTasksCount}</p>
               </div>
-              <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl">
                 <ListTodo className="w-6 h-6" />
               </div>
             </div>
 
             {/* In Progress */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">In Progress</span>
-                <p className="text-3xl font-bold text-slate-900 mt-2">{inProgressCount}</p>
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">In Progress</span>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{inProgressCount}</p>
               </div>
-              <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
+              <div className="p-3 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-xl">
                 <Clock className="w-6 h-6" />
               </div>
             </div>
 
             {/* Tasks Halted */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tasks Halted</span>
-                <p className="text-3xl font-bold text-slate-900 mt-2">{haltedCount}</p>
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Tasks Halted</span>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{haltedCount}</p>
               </div>
-              <div className="p-3 bg-rose-50 text-rose-600 rounded-xl">
+              <div className="p-3 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-xl">
                 <PauseCircle className="w-6 h-6" />
               </div>
             </div>
 
             {/* Completed */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Completed</span>
-                <p className="text-3xl font-bold text-slate-900 mt-2">{completedCount}</p>
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Completed</span>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{completedCount}</p>
               </div>
-              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
             </div>
           </div>
 
           {/* TASK LIST TABLE */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+          <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl shadow-xs overflow-hidden">
             
-            {/* Table Header (Priority Header Removed) */}
-            <div className="grid grid-cols-12 px-6 py-4 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50/50">
-              <div className="col-span-7">Task Details</div>
+            {/* Table Header */}
+            <div className="grid grid-cols-12 px-6 py-4 border-b border-slate-100 dark:border-slate-700 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/50">
+              <div className="col-span-6">Task Details</div>
               <div className="col-span-2 text-center">Ask AI</div>
               <div className="col-span-2 text-center">Due Date</div>
-              <div className="col-span-1 text-right">Actions</div>
+              <div className="col-span-2 text-right pr-2">Actions</div>
             </div>
 
             {/* Table Body */}
             {displayedTasks.length === 0 ? (
-              <div className="p-8 text-center text-slate-500 text-sm">
+              <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-sm">
                 No tasks found. Click "Add Task" to create one!
               </div>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100 dark:divide-slate-700">
                 {displayedTasks.map((task) => (
-                  <div key={task.task_id} className="p-4 transition-colors hover:bg-slate-50/80">
+                  <div key={task.task_id} className="p-4 transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-700/50">
                     {editingTaskId === task.task_id ? (
                       /* INLINE EDIT MODE */
-                      <div className="flex flex-col gap-3 p-2 bg-slate-50 rounded-xl border border-slate-200">
+                      <div className="flex flex-col gap-3 p-2 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <input
                             type="text"
                             value={editTitle}
                             onChange={(e) => setEditTitle(e.target.value)}
-                            className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"
+                            className="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white"
                           />
                           <input
                             type="date"
                             value={editDate}
                             onChange={(e) => setEditDate(e.target.value)}
-                            className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"
+                            className="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white"
                           />
                         </div>
                         <input
                           type="text"
                           value={editDescription}
                           onChange={(e) => setEditDescription(e.target.value)}
-                          className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"
+                          className="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white"
                         />
                         <div className="flex items-center justify-between">
                           <select
                             value={editstatus}
                             onChange={(e) => setEditStatus(e.target.value)}
-                            className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm"
+                            className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white"
                           >
                             <option value={TASK_STATUS.IN_PROGRESS}>In Progress</option>
                             <option value={TASK_STATUS.COMPLETED}>Completed</option>
@@ -438,7 +474,7 @@ function Dashboard() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => setEditingTaskId(null)}
-                              className="px-3 py-1.5 bg-slate-200 text-slate-700 text-xs rounded-lg font-medium"
+                              className="px-3 py-1.5 bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs rounded-lg font-medium"
                             >
                               Cancel
                             </button>
@@ -456,20 +492,22 @@ function Dashboard() {
                       <div className="grid grid-cols-12 items-center px-2 py-1">
                         
                         {/* Task Details & Checkbox */}
-                        <div className="col-span-7 flex items-start gap-4">
+                        <div className="col-span-6 flex items-start gap-4">
                           <input
                             type="checkbox"
                             checked={task.status === TASK_STATUS.COMPLETED}
                             onChange={() => handleToggleComplete(task)}
-                            className="mt-1 w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                            className="mt-1 w-5 h-5 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 cursor-pointer"
                           />
                           <div>
                             <h3 className={`text-base font-semibold ${
-                              task.status === TASK_STATUS.COMPLETED ? 'line-through text-slate-400' : 'text-slate-800'
+                              task.status === TASK_STATUS.COMPLETED 
+                                ? 'line-through text-slate-400 dark:text-slate-500' 
+                                : 'text-slate-800 dark:text-slate-100'
                             }`}>
                               {task.title}
                             </h3>
-                            <p className="text-sm text-slate-500 mt-0.5">{task.description}</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{task.description}</p>
                           </div>
                         </div>
 
@@ -480,7 +518,7 @@ function Dashboard() {
                               setSelectedTask(task);
                               setIsChatOpen(true);
                             }}
-                            className="p-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl transition-all shadow-xs group"
+                            className="p-2 bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 rounded-xl transition-all shadow-xs group"
                             title="Chat with AI about this task"
                           >
                             <Sparkles className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -488,23 +526,23 @@ function Dashboard() {
                         </div>
 
                         {/* Due Date */}
-                        <div className="col-span-2 flex items-center justify-center gap-2 text-sm text-slate-600">
+                        <div className="col-span-2 flex items-center justify-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                           <Calendar className="w-4 h-4 text-slate-400" />
                           <span>{task.due_date ? task.due_date : 'No deadline'}</span>
                         </div>
 
                         {/* Actions */}
-                        <div className="col-span-1 flex items-center justify-end gap-1">
+                        <div className="col-span-2 flex items-center justify-end gap-2 pr-2">
                           <button
                             onClick={() => startEdit(task)}
-                            className="p-2 hover:text-slate-700 text-slate-400 rounded-lg hover:bg-slate-100 transition-colors"
+                            className="p-1.5 hover:text-slate-700 dark:hover:text-white text-slate-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                             title="Edit task"
                           >
                             <Wrench className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => deleteTasks(task.task_id)}
-                            className="p-2 hover:text-rose-600 text-slate-400 rounded-lg hover:bg-slate-100 transition-colors"
+                            className="p-1.5 hover:text-rose-600 text-slate-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                             title="Delete task"
                           >
                             <Trash2 className="w-4 h-4" />
