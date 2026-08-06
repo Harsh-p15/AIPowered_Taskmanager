@@ -14,6 +14,7 @@ from pathlib import Path
 import environ
 import os
 from datetime import timedelta
+import dj_database_url
 
 # 1. Django defines BASE_DIR first:
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,12 +32,12 @@ GROQ_API_KEY = env('GROQ_API_KEY', default='')
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-veh%jy@ob0xqm-1!(21#=s0-&dq11f-1a0py%ta2!9uj0pw!*f"
+SECRET_KEY = os.environ.get('SECRET_KEY', 'your-default-dev-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -89,11 +90,12 @@ WSGI_APPLICATION = "Task_manager.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# Database settings (Uses Neon in production via DATABASE_URL, falls back to local SQLite)
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600
+    )
 }
 
 
@@ -131,7 +133,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
