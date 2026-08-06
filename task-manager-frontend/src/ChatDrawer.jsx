@@ -137,7 +137,7 @@ const styles = {
     top: 0,
     right: 0,
     width: '100vw',
-    height: '100vh',
+    height: '100dvh',
     backgroundColor: 'rgba(0,0,0,0.4)',
     zIndex: 1000,
     display: 'flex',
@@ -145,7 +145,7 @@ const styles = {
   },
   drawer: {
     width: '450px',
-    height: '100%',
+    height: '100dvh',
     backgroundColor: '#232323',
     boxShadow: '-5px 0 15px rgba(0,0,0,0.5)',
     display: 'flex',
