@@ -20,6 +20,7 @@ import {
   X,
   Sun,
   Moon,
+  Menu,
 } from 'lucide-react';
 
 function Dashboard() {
@@ -43,6 +44,9 @@ function Dashboard() {
   const [status, setStatus] = useState(TASK_STATUS.IN_PROGRESS);
   const [editstatus, setEditStatus] = useState(TASK_STATUS.IN_PROGRESS);
   const [activeTab, setActiveTab] = useState('my-tasks');
+
+  // Mobile Sidebar Toggle State
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Dark Mode State Initializer
   const [darkMode, setDarkMode] = useState(() => {
@@ -197,69 +201,95 @@ function Dashboard() {
     return true; // 'my-tasks' shows all
   });
 
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    setIsSidebarOpen(false); // Auto-close sidebar on mobile after selection
+  };
+
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased overflow-hidden transition-colors duration-200">
       
-      {/* LEFT SIDEBAR */}
-      <aside className="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col justify-between shrink-0 transition-colors duration-200">
+      {/* MOBILE BACKDROP OVERLAY */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 z-40 md:hidden backdrop-blur-xs transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* LEFT SIDEBAR (COLLAPSIBLE ON MOBILE) */}
+      <aside className={`
+        fixed md:static inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col justify-between shrink-0 transition-transform duration-200 ease-in-out
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
         <div>
-          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100 dark:border-slate-700">
-            <div className="p-2 bg-blue-600 rounded-lg text-white">
-              <Layers className="w-5 h-5" />
+          <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-700">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-600 rounded-lg text-white">
+                <Layers className="w-5 h-5" />
+              </div>
+              <span className="font-bold text-lg text-slate-900 dark:text-white tracking-tight">TaskFlow</span>
             </div>
-            <span className="font-bold text-lg text-slate-900 dark:text-white tracking-tight">TaskFlow</span>
+            
+            {/* Close Sidebar Button for Mobile */}
+            <button 
+              onClick={() => setIsSidebarOpen(false)}
+              className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 md:hidden"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
           <nav className="p-4 space-y-1">
-              <button
-               onClick={() => setActiveTab('my-tasks')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+            <button
+              onClick={() => handleTabClick('my-tasks')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
                 activeTab === 'my-tasks' 
                   ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-                }`}
-              >
-          <CheckSquare className="w-5 h-5" />
-            My Tasks
-          </button>
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+              }`}
+            >
+              <CheckSquare className="w-5 h-5" />
+              My Tasks
+            </button>
 
             <button
-              onClick={() => setActiveTab('in-progress')}
+              onClick={() => handleTabClick('in-progress')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
-              activeTab === 'in-progress' 
-              ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                activeTab === 'in-progress' 
+                  ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
-          >
-          <Clock className="w-5 h-5" />
-            In Progress
-          </button>
+            >
+              <Clock className="w-5 h-5" />
+              In Progress
+            </button>
 
-          <button
-            onClick={() => setActiveTab('halted')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
-            activeTab === 'halted' 
-            ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
-            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-            }`}
-          >
-          <PauseCircle className="w-5 h-5" />
-            Halted
-          </button>
+            <button
+              onClick={() => handleTabClick('halted')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                activeTab === 'halted' 
+                  ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+              }`}
+            >
+              <PauseCircle className="w-5 h-5" />
+              Halted
+            </button>
 
-        <button
-          onClick={() => setActiveTab('completed')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
-          activeTab === 'completed' 
-          ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
-          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-          }`}
-        >
-        <CheckCircle2 className="w-5 h-5" />
-          Completed
-      </button>
-      </nav>
-      </div>
+            <button
+              onClick={() => handleTabClick('completed')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                activeTab === 'completed' 
+                  ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' 
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+              }`}
+            >
+              <CheckCircle2 className="w-5 h-5" />
+              Completed
+            </button>
+          </nav>
+        </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
