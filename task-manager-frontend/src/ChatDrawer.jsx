@@ -24,7 +24,7 @@ function ChatDrawer({ isOpen, onClose, taskId, taskTitle, token }) {
 
   const fetchChatHistory = async () => {
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/ai/chat/${taskId}/`, {
+      const response = await axios.get(`https://aipowered-taskmanager.onrender.com/api/ai/chat/${taskId}/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessages(response.data.messages || []);
@@ -46,7 +46,7 @@ function ChatDrawer({ isOpen, onClose, taskId, taskTitle, token }) {
 
     try {
       const response = await axios.post(
-        `http://127.0.0.1:8000/api/ai/chat/${taskId}/`,
+        `https://aipowered-taskmanager.onrender.com/api/ai/chat/${taskId}/`,
         { message: userMsg },
         { headers: { Authorization: `Bearer ${token}` } }
       );

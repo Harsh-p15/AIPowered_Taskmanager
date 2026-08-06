@@ -83,7 +83,7 @@ function Dashboard() {
       return;
     }
     try {
-      const response = await axios.get('http://127.0.0.1:8000/api/tasks/', getAuthHeaders());
+      const response = await axios.get('https://aipowered-taskmanager.onrender.com/api/tasks/', getAuthHeaders());
       setTasks(response.data);
     } catch (err) {
       setError("Could not fetch tasks");
@@ -107,7 +107,7 @@ function Dashboard() {
     };
     try {
       await axios.post(
-        'http://127.0.0.1:8000/api/tasks/', 
+        'https://aipowered-taskmanager.onrender.com/api/tasks/', 
         payload , 
         getAuthHeaders()
       );
@@ -125,7 +125,7 @@ function Dashboard() {
   // Delete Tasks
   const deleteTasks = async (id) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/tasks/${id}/`, getAuthHeaders());
+      await axios.delete(`https://aipowered-taskmanager.onrender.com/api/tasks/${id}/`, getAuthHeaders());
       fetchTasks();
     } catch (error) {
       setError('Failed to delete task');
@@ -144,7 +144,7 @@ function Dashboard() {
         };
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/tasks/${id}/`,
+        `https://aipowered-taskmanager.onrender.com/api/tasks/${id}/`,
         payload, 
         getAuthHeaders()
       );
@@ -168,7 +168,7 @@ function Dashboard() {
     const newStatus = task.status === TASK_STATUS.COMPLETED ? TASK_STATUS.IN_PROGRESS : TASK_STATUS.COMPLETED;
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/tasks/${task.task_id}/`,
+        `https://aipowered-taskmanager.onrender.com/api/tasks/${task.task_id}/`,
         {
           title: task.title,
           description: task.description,

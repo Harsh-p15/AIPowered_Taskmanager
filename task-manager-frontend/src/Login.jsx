@@ -17,7 +17,7 @@ function Login({ onLoginSuccess }) {
 
     try {
       // Adjust URL if your JWT token obtain route differs (e.g., /api/token/ or /api/login/)
-      const response = await axios.post('http://127.0.0.1:8000/api/auth/login/', {
+      const response = await axios.post('https://aipowered-taskmanager.onrender.com/api/auth/login/', {
         username,
         password,
       });
